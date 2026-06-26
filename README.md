@@ -96,3 +96,7 @@ The ECS Fargate sample is in [examples/ecs-firelens](examples/ecs-firelens). It 
 ## Release Direction
 
 The expected release artifact is the `.so` file produced by `plugin/Dockerfile.build`. CI should treat this artifact as the primary output and attach it to releases. Terraform validation and the ECS sample are secondary checks.
+
+## License
+
+This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
