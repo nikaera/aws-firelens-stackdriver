@@ -26,6 +26,100 @@ locals {
 
   app_image      = "${aws_ecr_repository.app.repository_url}:${var.app_image_tag}"
   firelens_image = "${aws_ecr_repository.fluentbit.repository_url}:${var.firelens_image_tag}"
+  firelens_user  = var.firelens_container_user == null ? {} : { user = var.firelens_container_user }
+  container_definitions = [
+    merge({
+      name      = "log_router"
+      image     = local.firelens_image
+      essential = true
+      firelensConfiguration = {
+        type = "fluentbit"
+        options = {
+          "enable-ecs-log-metadata" = "false"
+          "config-file-type"        = "file"
+          "config-file-value"       = "/fluent-bit/etc/pipeline.conf"
+        }
+      }
+      environment = [
+        {
+          name  = "AWS_REGION"
+          value = var.aws_region
+        },
+        {
+          name  = "GCP_PROJECT_ID"
+          value = var.gcp_project_id
+        },
+        {
+          name  = "GCP_PROJECT_NUMBER"
+          value = data.google_project.current.number
+        },
+        {
+          name  = "CLOUD_LOGGING_LOG_ID"
+          value = local.cloud_logging_log_id
+        },
+        {
+          name  = "WIF_POOL_ID"
+          value = google_iam_workload_identity_pool.aws.workload_identity_pool_id
+        },
+        {
+          name  = "WIF_PROVIDER_ID"
+          value = google_iam_workload_identity_pool_provider.aws.workload_identity_pool_provider_id
+        },
+        {
+          name  = "GOOGLE_SERVICE_ACCOUNT"
+          value = google_service_account.firelens.email
+        },
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.firelens.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "firelens"
+        }
+      }
+      mountPoints            = []
+      portMappings           = []
+      readonlyRootFilesystem = var.firelens_readonly_root_filesystem
+      systemControls         = []
+      volumesFrom            = []
+    }, local.firelens_user),
+    {
+      name      = "app"
+      image     = local.app_image
+      essential = true
+      portMappings = [
+        {
+          containerPort = var.container_port
+          hostPort      = var.container_port
+          protocol      = "tcp"
+        }
+      ]
+      dependsOn = [
+        {
+          containerName = "log_router"
+          condition     = "START"
+        }
+      ]
+      environment = [
+        {
+          name  = "PORT"
+          value = tostring(var.container_port)
+        },
+        {
+          name  = "SERVICE_NAME"
+          value = local.name
+        },
+      ]
+      logConfiguration = {
+        logDriver = "awsfirelens"
+      }
+      mountPoints            = []
+      readonlyRootFilesystem = var.app_readonly_root_filesystem
+      systemControls         = []
+      volumesFrom            = []
+    },
+  ]
   public_subnets = tomap({
     for index, az in local.availability_zones : az => {
       az         = az
@@ -257,100 +351,7 @@ resource "aws_ecs_task_definition" "this" {
     cpu_architecture        = "ARM64"
   }
 
-  container_definitions = jsonencode([
-    {
-      name      = "log_router"
-      image     = local.firelens_image
-      essential = true
-      firelensConfiguration = {
-        type = "fluentbit"
-        options = {
-          "enable-ecs-log-metadata" = "false"
-          "config-file-type"        = "file"
-          "config-file-value"       = "/fluent-bit/etc/pipeline.conf"
-        }
-      }
-      environment = [
-        {
-          name  = "AWS_REGION"
-          value = var.aws_region
-        },
-        {
-          name  = "GCP_PROJECT_ID"
-          value = var.gcp_project_id
-        },
-        {
-          name  = "GCP_PROJECT_NUMBER"
-          value = data.google_project.current.number
-        },
-        {
-          name  = "CLOUD_LOGGING_LOG_ID"
-          value = local.cloud_logging_log_id
-        },
-        {
-          name  = "WIF_POOL_ID"
-          value = google_iam_workload_identity_pool.aws.workload_identity_pool_id
-        },
-        {
-          name  = "WIF_PROVIDER_ID"
-          value = google_iam_workload_identity_pool_provider.aws.workload_identity_pool_provider_id
-        },
-        {
-          name  = "GOOGLE_SERVICE_ACCOUNT"
-          value = google_service_account.firelens.email
-        },
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.firelens.name
-          "awslogs-region"        = var.aws_region
-          "awslogs-stream-prefix" = "firelens"
-        }
-      }
-      mountPoints            = []
-      portMappings           = []
-      readonlyRootFilesystem = var.readonly_root_filesystem
-      systemControls         = []
-      user                   = var.firelens_container_user
-      volumesFrom            = []
-    },
-    {
-      name      = "app"
-      image     = local.app_image
-      essential = true
-      portMappings = [
-        {
-          containerPort = var.container_port
-          hostPort      = var.container_port
-          protocol      = "tcp"
-        }
-      ]
-      dependsOn = [
-        {
-          containerName = "log_router"
-          condition     = "START"
-        }
-      ]
-      environment = [
-        {
-          name  = "PORT"
-          value = tostring(var.container_port)
-        },
-        {
-          name  = "SERVICE_NAME"
-          value = local.name
-        },
-      ]
-      logConfiguration = {
-        logDriver = "awsfirelens"
-      }
-      mountPoints            = []
-      readonlyRootFilesystem = var.readonly_root_filesystem
-      systemControls         = []
-      volumesFrom            = []
-    },
-  ])
+  container_definitions = jsonencode(local.container_definitions)
 
   tags = local.common_tags
 
