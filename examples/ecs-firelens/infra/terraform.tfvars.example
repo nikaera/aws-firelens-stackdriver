@@ -1,0 +1,14 @@
+gcp_project_id = "your-gcp-project-id"
+
+# Optional: use a named AWS shared config profile.
+# aws_profile = "your-aws-profile"
+
+# Keep this scoped to your client or test network.
+allowed_ingress_cidrs = ["203.0.113.10/32"]
+
+# Use unique tags when ecr_image_tag_mutability is IMMUTABLE.
+app_image_tag      = "example-1"
+firelens_image_tag = "example-1"
+
+# Set this to true only for disposable test repositories.
+ecr_force_delete = false

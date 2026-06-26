@@ -1,0 +1,68 @@
+# Created from https://www.toptal.com/developers/gitignore templates:
+# go,terraform,docker
+
+### Go ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+### Terraform ###
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude variable files because they can contain sensitive values.
+*.tfvars
+*.tfvars.json
+
+# Keep the public example committed.
+!*.tfvars.example
+
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform CLI config files
+.terraformrc
+terraform.rc
+
+### Docker ###
+.dockerignore
+docker-compose.override.yml
+
+### Project-specific ###
+.cache/
+
+# Generated Fluent Bit plugin artifacts
+plugin/dist/
+plugin/out_stackdriver_wif.h
+plugin/out_stackdriver_wif.so
+
+# Local credential/config files
+examples/ecs-firelens/fluentbit/google-aws-wif.json
+*.pem
+*.key
+*.crt
+*.p12
+*.json.key
