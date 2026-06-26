@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.25.1
+ARG GO_VERSION=1.26.4
 ARG GO_TARBALL_SHA256=
 
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS builder
