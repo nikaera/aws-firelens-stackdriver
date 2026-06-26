@@ -118,5 +118,5 @@ gcloud logging read \
 - The sample service runs in public subnets and allows all outbound traffic for simplicity. For real deployments, use private subnets, VPC endpoints or NAT, and explicit egress controls.
 - ECR repositories are not force-deleted by default. Set `ecr_force_delete=true` only for disposable test environments.
 - ECR tags are immutable by default. Use a new image tag for each rebuild, or set `ecr_image_tag_mutability="MUTABLE"` for quick local iteration.
-- The FireLens container runs as a non-root user and both containers use read-only root filesystems by default. Set `firelens_container_user` or `readonly_root_filesystem` only if the selected Fluent Bit image requires it.
+- The app container uses a read-only root filesystem by default. The FireLens container keeps its root filesystem writable because the `aws-for-fluent-bit:init-*` image writes init files at startup. `firelens_container_user` is omitted by default so the selected image controls its runtime user.
 - This is a small verification environment. It does not include an ALB, private subnets, NAT, autoscaling, or VPC endpoints.

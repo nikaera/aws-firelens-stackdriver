@@ -85,16 +85,22 @@ variable "ecr_image_tag_mutability" {
   }
 }
 
-variable "readonly_root_filesystem" {
-  description = "Enable read-only root filesystems for the sample ECS containers."
+variable "app_readonly_root_filesystem" {
+  description = "Enable a read-only root filesystem for the sample app container."
   type        = bool
   default     = true
 }
 
+variable "firelens_readonly_root_filesystem" {
+  description = "Enable a read-only root filesystem for the FireLens container. The aws-for-fluent-bit init image writes startup files, so keep this false unless the selected image and mounts are verified."
+  type        = bool
+  default     = false
+}
+
 variable "firelens_container_user" {
-  description = "User used by the FireLens container. Set to 0 only if the selected Fluent Bit image requires root."
+  description = "Optional user for the FireLens container. Leave null to use the selected image default."
   type        = string
-  default     = "10001"
+  default     = null
 }
 
 variable "allowed_ingress_cidrs" {
