@@ -1,5 +1,10 @@
 # aws-firelens-stackdriver
 
+[![Plugin CI](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/plugin-ci.yml/badge.svg)](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/plugin-ci.yml)
+[![Example CI](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/example-ci.yml/badge.svg)](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/example-ci.yml)
+[![Workflow CI](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/workflow-ci.yml/badge.svg)](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/workflow-ci.yml)
+[![Plugin Artifact](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/plugin-artifact.yml/badge.svg)](https://github.com/nikaera/aws-firelens-stackdriver/actions/workflows/plugin-artifact.yml)
+
 Fluent Bit output plugin for sending ECS FireLens logs to Google Cloud Logging.
 
 The main artifact is:
