@@ -7,6 +7,11 @@
 
 Fluent Bit output plugin for sending ECS FireLens logs to Google Cloud Logging.
 
+> [!CAUTION]
+> This project fills the current gap for ECS FireLens workloads that need AWS Workload Identity Federation with Google Cloud Logging.
+>
+> The Fluent Bit project is working on Workload Identity Federation support in the official `out_stackdriver` plugin: [fluent/fluent-bit#11758](https://github.com/fluent/fluent-bit/pull/11758). Once the official plugin supports the AWS `external_account` credential source and that support is available in the Fluent Bit or AWS for Fluent Bit release you use, prefer the official plugin over this project.
+
 The main artifact is:
 
 ```text
